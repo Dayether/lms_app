@@ -100,4 +100,49 @@ function insertGenre($genreName)
     }
 }
 
+function insertBook($title, $isbn, $year, $genres, $quantity)
+{
+    $con = $this->opencon();
+    try {
+        $stmt = $con->prepare("INSERT INTO books (book_title, book_isbn, book_year, book_genres, book_quantity) VALUES (?, ?, ?, ?, ?)");
+        return $stmt->execute([$title, $isbn, $year, $genres, $quantity]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+function insertBookWithGenres($title, $isbn, $year, $quantity, $genreNames)
+{
+    $con = $this->opencon();
+    try {
+        $con->beginTransaction();
+
+        // Insert book
+        $stmt = $con->prepare("INSERT INTO books (book_title, book_isbn, book_pubyear, quantity_avail) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$title, $isbn, $year, $quantity]);
+        $bookId = $con->lastInsertId();
+
+        // For each genre, get genre_id and insert into genre_books
+        foreach ($genreNames as $genreName) {
+            // Get genre_id from genres table
+            $stmtGenre = $con->prepare("SELECT genre_id FROM genres WHERE genre_name = ?");
+            $stmtGenre->execute([$genreName]);
+            $genre = $stmtGenre->fetch(PDO::FETCH_ASSOC);
+
+            if ($genre) {
+                $genreId = $genre['genre_id'];
+                // Insert into genre_books
+                $stmtGB = $con->prepare("INSERT INTO genre_books (genre_id, book_id) VALUES (?, ?)");
+                $stmtGB->execute([$genreId, $bookId]);
+            }
+        }
+
+        $con->commit();
+        return true;
+    } catch (PDOException $e) {
+        $con->rollBack();
+        return false;
+    }
+}
+
 }
