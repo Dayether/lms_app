@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
 
 require_once('classes/database.php');
 require_once('classes/functions.php');
@@ -7,6 +10,7 @@ $con = new database();
 $sweetAlertConfig = ''; // Initialize the variable
 
 if(isset($_POST['multisave'])){
+ 
   $email = $_POST['email'];
   $username = $_POST['username'];
   $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
@@ -32,6 +36,8 @@ if(isset($_POST['multisave'])){
 
   if ($userID){
 
+  
+
   $street = $_POST['user_street'];
   $barangay = $_POST['user_barangay'];
   $city = $_POST['user_city'];
@@ -49,7 +55,7 @@ if(isset($_POST['multisave'])){
       }).then((result) => {
         if (result.isConfirmed) {
           // Redirect to login page
-          window.location.href = 'login.php';
+          window.location.href = 'index.php';
         }
       });
     </script>";
@@ -80,7 +86,6 @@ if(isset($_POST['multisave'])){
   <link rel="stylesheet" href="./bootstrap-5.3.3-dist/css/bootstrap.css">
   <!-- JQuery for Address Selector -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <title>LMS | Registration</title>
